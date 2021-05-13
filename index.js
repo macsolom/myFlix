@@ -1,80 +1,70 @@
-//Import express and create the server
 const express = require('express');
-const morgan = require('morgan');
+morgan = require('morgan');
 const app = express();
 
-let topMovies = [
-	{
-		title: 'Love and Basketball'
-	},
-	{
-		title: 'Star Wars: The Last Jedi'
-	},
-	{
-		title: 'Avitar'
-	},
-	{
-		title: 'He Got Game'
-	},
-	{
-		title: 'Independence Day'
-	},
-	{
-		title: 'Training Day'
-	},
-	{
-		title: 'The Dark Night'
-	},
-	{
-		title: 'Jurassic World'
-	},
-	{
-		title: 'Fast and Furious'
-	},
-	{
-		title: 'Toy Story'
-	},
-	{
-		title: 'Black Panther'
-	},
-	{
-		title: 'Men in Black'
-	},
-	{
-		title: 'Home Alone'
-	}
 
-];
+let movies = [
+  {
+    title: 'Star Wars: The Last Jedi',
+    description: 'Star Wars: The Last Jedi is a 2017 American epic space opera film and is the second installment of the Star Wars sequel trilogy.',
+    director: 'Rian Johnson',
+    genre:'Action',
+  }
+]
 
+//Middleware
 
+app.use(bodyParser.json());
 
-
-//get the top 10 movies
-app.get('/movies', (req, res) => {
-	res.json(topMovies.slice(0, 10));
-});
-
-//get the starting request
-app.get('/', (req, res) => {
-	res.send('Welcome to myFlix movies!');
-});
-
-//Get the documentation
-app.use(express.static('public'));
-app.get('/documentation', (req, res) => {
-	        res.sendFile('public/documentation.html', {root: __dirname});
-});
-
-//logs into the Terminal
 app.use(morgan('common'));
 
-//Error-handling middleware
+app.use(express.static('public'));
+ //error handling
 app.use((err, req, res, next) => {
-	        console.log(err.stack);
-	        res.status(500).send('Somthing broke!');
+    console.error(err.stack);
+    res.status(500).send('Something broke! try again!!');
+  });
+
+app.get('/movies', (req, res) => {
+  res.json(movies);
 });
 
-//Listen for requests 
-app.listen(8080, () => {
-	console.log('Your app is listening on port 8080.');
+app.get('/movies/:title', (req, res) => {
+  res.json(movies.find((movie) => {
+  return movie.title === req.params.title
+  }));
+});
+
+app.get('/movies/genres/:genre', (req, res) => {
+  res.send('Successful GET request returning a description of the genre')
+});
+
+app.get('/movies/directors/:name', (req, res) => {
+  res.send('Successful GET request returning a description of the Director')
+});
+
+app.post('/users', (req, res) => {
+  res.send('Registration succesful!')
+});
+
+app.put('/users/:username', (req, res) => {
+ res.send('The user: ' + req.params.username + ' was successfully updated')
+});
+
+app.post('/users/:username/favourites', (req, res) => {
+  res.send('Movie: ' + req.params.title + ' was added to favourites.');
+  });
+
+app.delete('/users/:username/favourites/:title', (req, res) => {
+ res.send('Movie: ' + req.params.title + ' was removed from favourites.');
+});
+
+app.delete('/users/:username', (req, res) => {
+  res.send('User ' + req.params.id + ' was deleted.');
+  });
+
+
+//Listen for requests
+app.listen(8080,()=>{
+    console.log("your app is listening");
 });
